@@ -106,4 +106,57 @@ CSV.open('teach-write.csv', 'w') do |csv|
   end
 end
 
+# grade_text_file_array = [
+# {"Student_last"=>"Botsworth", "Student_first"=>"Chris", "Average_score"=>"86.2", "Letter_grade"=>"B"}
+# {"Student_last"=>"Boyd", "Student_first"=>"Bryan", "Average_score"=>"64.0", "Letter_grade"=>"D"}
+# {"Student_last"=>"Fallon", "Student_first"=>"Jimmy", "Average_score"=>"80.4", "Letter_grade"=>"B"}
+# {"Student_last"=>"Smith", "Student_first"=>"Johnny", "Average_score"=>"78.6", "Letter_grade"=>"C"}
+# {"Student_last"=>"Strong", "Student_first"=>"Sally", "Average_score"=>"94.0", "Letter_grade"=>"A"}]
+
+def class_average(array, key)
+  scores = []
+  array.each { |row| scores << row[key].to_f }
+  sprintf('%.1f', scores.reduce(:+) / scores.length)
+end
+
+puts class_average(grade_text_file_array, "Average_score")
+
+def class_min_score(array, key)
+  scores = []
+  array.each { |row| scores << row[key].to_f }
+  sprintf('%.1f', scores.min)
+end
+
+def class_max_score(array, key)
+  scores = []
+  array.each { |row| scores << row[key].to_f }
+  sprintf('%.1f', scores.max)
+  
+end
+
+def class_std_deviation(array, key)
+  student_class_diffs = []
+  array.each do |row|
+    student_class_diffs << (row[key].to_f - class_average(array, key).to_f)**2
+  end
+  sum_over_count = student_class_diffs.reduce(:+) / student_class_diffs.length
+  sprintf('%.1f', Math.sqrt(sum_over_count))
+end
+
+puts class_std_deviation(grade_text_file_array, "Average_score")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
