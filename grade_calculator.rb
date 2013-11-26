@@ -6,6 +6,8 @@
 
 
 require 'csv'
+require 'table_print'
+require 'pry'
 
 class GradeReader
   def initialize(filename)
@@ -59,9 +61,9 @@ end
 # PROGRAM
 
 grade_import = GradeReader.new("grades.csv")
-raw_grade_data = grade_import.grade_data
+raw_grade_data = grade_import.grade_data.sort_by {|row| row["Student_last"]}
 
-
+tp raw_grade_data
 
 def average_score(grades, last_name, first_name)
   student_info = grades.select { |row| row["Student_last"] == last_name && row["Student_first"] == first_name}[0]
@@ -69,10 +71,39 @@ def average_score(grades, last_name, first_name)
   student_grades = student_info.reject {|k,v| !k.downcase.include?('assign')}.values
   student_grades = student_grades.map {|grade| grade.to_i }
 
-  avg_grade = sprintf('%.1f', student_grades.reduce(:+) / student_grades.count.to_f)
+  average = sprintf('%.1f', student_grades.reduce(:+) / student_grades.count.to_f)
+end
 
-    print student_grades
-    print avg_grade
+def letter_grade(average_score)
+  if average_score.to_f >= 90
+    'A'
+  elsif average_score.to_f >= 80
+    'B'
+  elsif average_score.to_f >= 70
+    'C'
+  elsif average_score.to_f >= 60
+    'D'
+  else
+    'F'
   end
+end
 
-average_score(raw_grade_data, "Smith", "Johnny")
+grade_text_file_array = []
+raw_grade_data.each do |row|
+  student_avg_score = average_score(raw_grade_data, row["Student_last"], row["Student_first"])
+
+  grade_text_file_array << {"Student_last" => row["Student_last"], "Student_first" => row["Student_first"], "Average_score" => student_avg_score, "Letter_grade" => letter_grade(student_avg_score)}
+  
+  puts "#{row["Student_last"]}, #{row["Student_first"]}: #{student_avg_score}, #{letter_grade(student_avg_score)}"
+end
+
+
+column_names = grade_text_file_array.first.keys
+CSV.open('teach-write.csv', 'w') do |csv|
+  csv << column_names
+  grade_text_file_array.each do |row|
+    csv << row.values
+  end
+end
+
+
