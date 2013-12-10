@@ -3,77 +3,77 @@
                     # {"Student_last"=>"Fallon", "Student_first"=>"Jimmy", "Assignment_1"=>"95", "Assignment_2"=>"97", "Assignment_3"=>"85", "Assignment_4"=>"40", "Assignment_5"=>"85"}, 
                     # {"Student_last"=>"Botsworth", "Student_first"=>"Chris", "Assignment_1"=>"98", "Assignment_2"=>"86", "Assignment_3"=>"85", "Assignment_4"=>"82", "Assignment_5"=>"80"}, 
                     # {"Student_last"=>"Boyd", "Student_first"=>"Bryan", "Assignment_1"=>"50", "Assignment_2"=>"60", "Assignment_3"=>"65", "Assignment_4"=>"70", "Assignment_5"=>"75"}]
-
-
+ 
+ 
 require 'csv'
 require 'table_print'
 require 'pry'
-
+ 
 class GradeReader
   def initialize(filename)
     @grade_data = []
     CSV.foreach(filename, headers:true) { |row| @grade_data << row }
     @grade_data = @grade_data.map { |row| row.to_hash }
   end
-
+ 
   def grade_data
     @grade_data
   end
-
+ 
 end
-
+ 
 class AssignmentGrade
   def initialize(assignment)
     @student
     @assignment
     @assignment_grade
   end
-
+ 
 end
-
+ 
 class FinalGrade
   def initialize
   end
-
+ 
   # calc average score & letter grade
 end
-
+ 
 class Student
   def initialize(first_name, last_name)
     @first_name = first_name
     @last_name = last_name
   end
-
+ 
   def average_score
     
   end
-
+ 
   def letter_grade
     
   end
 end
-
+ 
 class GradeSummary
   def initialize
   end
 end
-
+ 
 # PROGRAM
-
+ 
 grade_import = GradeReader.new("grades.csv")
 raw_grade_data = grade_import.grade_data.sort_by {|row| row["Student_last"]}
-
+ 
 tp raw_grade_data
-
+ 
 def average_score(grades, last_name, first_name)
   student_info = grades.select { |row| row["Student_last"] == last_name && row["Student_first"] == first_name}[0]
   
   student_grades = student_info.reject {|k,v| !k.downcase.include?('assign')}.values
   student_grades = student_grades.map {|grade| grade.to_i }
-
+ 
   average = sprintf('%.1f', student_grades.reduce(:+) / student_grades.count.to_f)
 end
-
+ 
 def letter_grade(average_score)
   if average_score.to_f >= 90
     'A'
@@ -87,17 +87,17 @@ def letter_grade(average_score)
     'F'
   end
 end
-
+ 
 grade_text_file_array = []
 raw_grade_data.each do |row|
   student_avg_score = average_score(raw_grade_data, row["Student_last"], row["Student_first"])
-
+ 
   grade_text_file_array << {"Student_last" => row["Student_last"], "Student_first" => row["Student_first"], "Average_score" => student_avg_score, "Letter_grade" => letter_grade(student_avg_score)}
   
   puts "#{row["Student_last"]}, #{row["Student_first"]}: #{student_avg_score}, #{letter_grade(student_avg_score)}"
 end
-
-
+ 
+ 
 column_names = grade_text_file_array.first.keys
 CSV.open('teach-write.csv', 'w') do |csv|
   csv << column_names
@@ -105,35 +105,35 @@ CSV.open('teach-write.csv', 'w') do |csv|
     csv << row.values
   end
 end
-
+ 
 # grade_text_file_array = [
 # {"Student_last"=>"Botsworth", "Student_first"=>"Chris", "Average_score"=>"86.2", "Letter_grade"=>"B"}
 # {"Student_last"=>"Boyd", "Student_first"=>"Bryan", "Average_score"=>"64.0", "Letter_grade"=>"D"}
 # {"Student_last"=>"Fallon", "Student_first"=>"Jimmy", "Average_score"=>"80.4", "Letter_grade"=>"B"}
 # {"Student_last"=>"Smith", "Student_first"=>"Johnny", "Average_score"=>"78.6", "Letter_grade"=>"C"}
 # {"Student_last"=>"Strong", "Student_first"=>"Sally", "Average_score"=>"94.0", "Letter_grade"=>"A"}]
-
+ 
 def class_average(array, key)
   scores = []
   array.each { |row| scores << row[key].to_f }
   sprintf('%.1f', scores.reduce(:+) / scores.length)
 end
-
+ 
 puts class_average(grade_text_file_array, "Average_score")
-
+ 
 def class_min_score(array, key)
   scores = []
   array.each { |row| scores << row[key].to_f }
   sprintf('%.1f', scores.min)
 end
-
+ 
 def class_max_score(array, key)
   scores = []
   array.each { |row| scores << row[key].to_f }
   sprintf('%.1f', scores.max)
   
 end
-
+ 
 def class_std_deviation(array, key)
   student_class_diffs = []
   array.each do |row|
@@ -142,7 +142,7 @@ def class_std_deviation(array, key)
   sum_over_count = student_class_diffs.reduce(:+) / student_class_diffs.length
   sprintf('%.1f', Math.sqrt(sum_over_count))
 end
-
+ 
 puts class_std_deviation(grade_text_file_array, "Average_score")
 
 
